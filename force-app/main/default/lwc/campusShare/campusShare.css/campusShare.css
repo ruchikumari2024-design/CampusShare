@@ -1,0 +1,195 @@
+
+.page {
+    padding: 1.5rem;
+    background: #f5f7fb;
+    min-height: 70vh;
+    border-radius: 0.75rem;
+}
+
+.hero {
+    padding: 2rem;
+    border-radius: 1rem;
+    background: linear-gradient(120deg, #12335b, #176b87);
+    color: white;
+    margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14rem;
+    font-weight: 700;
+    opacity: 0.85;
+}
+
+.hero h1 {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin: 0.5rem 0;
+}
+
+.subtitle {
+    font-size: 1rem;
+    opacity: 0.92;
+}
+
+.toolbar {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.content {
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-heading h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.section-heading p {
+    color: #68778b;
+    margin-top: 0.25rem;
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.resource-card {
+    border: 1px solid #e3e8ef;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    transition: box-shadow 0.2s ease;
+}
+
+.resource-card:hover {
+    box-shadow: 0 6px 18px rgba(18, 51, 91, 0.1);
+}
+
+.resource-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+    overflow-wrap: anywhere;
+}
+
+.resource-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.category,
+.status {
+    font-size: 0.72rem;
+    border-radius: 2rem;
+    padding: 0.3rem 0.65rem;
+    background: #eaf2ff;
+    color: #234f8a;
+}
+
+.status {
+    background: #e7f7ee;
+    color: #176b43;
+}
+
+.description {
+    color: #68778b;
+    min-height: 2.5rem;
+    overflow-wrap: anywhere;
+}
+
+.listing-type {
+    margin-top: 0.75rem;
+    font-weight: 600;
+}
+
+.price {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #68778b;
+}
+
+.empty-state h3 {
+    color: #24364b;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+}
+
+.notice {
+    background: #fff4df;
+    color: #76500a;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-panel {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid #e3e8ef;
+    border-radius: 0.75rem;
+}
+
+.form-panel lightning-input,
+.form-panel lightning-textarea,
+.form-panel lightning-combobox {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 650px) {
+    .page {
+        padding: 0.75rem;
+    }
+
+    .toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 1.5rem;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .content {
+        padding: 1rem;
+    }
+}

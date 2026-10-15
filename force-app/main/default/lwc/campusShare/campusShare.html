@@ -1,0 +1,526 @@
+
+<template>
+    <div class="campus-share slds-p-around_medium">
+
+        <!-- HEADER -->
+        <div class="slds-box slds-theme_default slds-m-bottom_large">
+            <div class="slds-grid slds-wrap slds-grid_align-spread
+                        slds-grid_vertical-align-center">
+                <div>
+                    <h1 class="slds-text-heading_large">
+                        CampusShare
+                    </h1>
+                    <p class="slds-m-top_x-small">
+                        Your campus resource-sharing marketplace.
+                        Rent, share, donate, or sell to fellow students.
+                    </p>
+                </div>
+
+                <div class="slds-m-top_small">
+                    <lightning-button
+                        label="Refresh Resources"
+                        icon-name="utility:refresh"
+                        onclick={handleRefresh}
+                        disabled={isLoading}>
+                    </lightning-button>
+
+                    <lightning-button
+                        class="slds-m-left_x-small"
+                        label="List a Resource"
+                        variant="brand"
+                        icon-name="utility:add"
+                        onclick={openListingForm}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="slds-box slds-theme_default slds-m-bottom_large">
+            <h2 class="slds-text-heading_medium slds-m-bottom_medium">
+                Find Campus Resources
+            </h2>
+
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_1-of-1
+                            slds-medium-size_2-of-3">
+                    <lightning-input
+                        type="search"
+                        label="Search resources"
+                        placeholder="Books, calculators, sports equipment..."
+                        value={searchKey}
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </div>
+
+                <div class="slds-col slds-size_1-of-1
+                            slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        label="Category"
+                        value={selectedCategory}
+                        options={categoryOptions}
+                        onchange={handleCategoryChange}>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    label="Apply Filters"
+                    variant="brand"
+                    onclick={handleRefresh}
+                    disabled={isLoading}>
+                </lightning-button>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <template lwc:if={isLoading}>
+            <lightning-spinner
+                alternative-text="Loading resources"
+                size="medium">
+            </lightning-spinner>
+        </template>
+
+        <!-- ERROR -->
+        <template lwc:if={errorMessage}>
+            <div class="slds-notify slds-notify_alert
+                        slds-alert_error slds-m-bottom_medium"
+                 role="alert">
+                {errorMessage}
+            </div>
+        </template>
+
+        <!-- MARKETPLACE -->
+        <h2 class="slds-text-heading_medium slds-m-bottom_medium">
+            Available Resources
+        </h2>
+
+        <template lwc:if={hasResources}>
+            <div class="slds-grid slds-wrap slds-gutters">
+                <template for:each={resources} for:item="resource">
+                    <div key={resource.Id}
+                         class="slds-col slds-size_1-of-1
+                                slds-medium-size_1-of-2
+                                slds-large-size_1-of-3
+                                slds-m-bottom_medium">
+
+                        <article class="slds-card">
+                            <div class="slds-card__header slds-grid">
+                                <header class="slds-media slds-media_center
+                                               slds-has-flexi-truncate">
+                                    <div class="slds-media__figure">
+                                        <lightning-icon
+                                            icon-name="standard:product"
+                                            size="medium">
+                                        </lightning-icon>
+                                    </div>
+
+                                    <div class="slds-media__body">
+                                        <h3 class="slds-text-heading_small">
+                                            {resource.Name}
+                                        </h3>
+                                        <p class="slds-text-body_small">
+                                            {resource.Category__c}
+                                        </p>
+                                    </div>
+                                </header>
+                            </div>
+
+                            <div class="slds-card__body
+                                        slds-card__body_inner">
+                                <p class="slds-m-bottom_small">
+                                    <template lwc:if={resource.Description__c}>
+                                        {resource.Description__c}
+                                    </template>
+                                    <template lwc:else>
+                                        No description provided.
+                                    </template>
+                                </p>
+
+                                <p>
+                                    <strong>Type:</strong>
+                                    {resource.Listing_Type__c}
+                                </p>
+
+                                <p>
+                                    <strong>Condition:</strong>
+                                    {resource.Condition__c}
+                                </p>
+
+                                <p>
+                                    <strong>Status:</strong>
+                                    {resource.Status__c}
+                                </p>
+
+                                <template lwc:if={resource.Price_Per_Day__c}>
+                                    <p>
+                                        <strong>Rental:</strong>
+                                        ₹{resource.Price_Per_Day__c}/day
+                                    </p>
+                                </template>
+
+                                <template lwc:if={resource.Sale_Price__c}>
+                                    <p>
+                                        <strong>Sale price:</strong>
+                                        ₹{resource.Sale_Price__c}
+                                    </p>
+                                </template>
+                            </div>
+
+                            <footer class="slds-card__footer">
+                                <template lwc:if={resource.canRequestRental}>
+                                    <lightning-button
+                                        label="Request Rental"
+                                        variant="brand"
+                                        data-id={resource.Id}
+                                        onclick={openRentalModal}>
+                                    </lightning-button>
+                                </template>
+
+                                <template lwc:if={resource.isSellType}>
+                                    <p class="slds-text-body_small">
+                                        Contact the owner about purchasing.
+                                    </p>
+                                </template>
+
+                                <template lwc:if={resource.resourceIsAvailable}>
+                                    <template lwc:if={resource.isRentType}>
+                                    </template>
+                                </template>
+
+                                <template lwc:if={resource.Status__c}>
+                                    <template lwc:if={resource.canRequestRental}>
+                                    </template>
+                                    <template lwc:else>
+                                        <p class="slds-text-body_small
+                                                  slds-text-color_weak">
+                                            Not available for rental requests.
+                                        </p>
+                                    </template>
+                                </template>
+                            </footer>
+                        </article>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template lwc:if={showEmptyState}>
+            <div class="slds-box slds-theme_default
+                        slds-align_absolute-center slds-p-around_xx-large">
+                <div class="slds-text-align_center">
+                    <lightning-icon
+                        icon-name="utility:search"
+                        size="large">
+                    </lightning-icon>
+                    <h3 class="slds-text-heading_medium slds-m-top_medium">
+                        No resources found
+                    </h3>
+                    <p class="slds-m-top_small">
+                        Try a different category or list a resource.
+                    </p>
+                </div>
+            </div>
+        </template>
+
+        <!-- LIST A RESOURCE MODAL -->
+        <template lwc:if={showListingForm}>
+            <section role="dialog"
+                     tabindex="-1"
+                     aria-modal="true"
+                     aria-labelledby="listing-heading"
+                     class="slds-modal slds-fade-in-open">
+
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            title="Close"
+                            onclick={closeListingForm}
+                            class="slds-modal__close">
+                        </lightning-button-icon>
+
+                        <h2 id="listing-heading"
+                            class="slds-text-heading_medium">
+                            List a Resource
+                        </h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-input
+                            label="Resource name"
+                            value={newResourceName}
+                            onchange={handleNameChange}
+                            required>
+                        </lightning-input>
+
+                        <lightning-textarea
+                            label="Description"
+                            value={newDescription}
+                            onchange={handleDescriptionChange}>
+                        </lightning-textarea>
+
+                        <lightning-combobox
+                            label="Category"
+                            value={newCategory}
+                            options={listingCategoryOptions}
+                            onchange={handleNewCategoryChange}
+                            required>
+                        </lightning-combobox>
+
+                        <lightning-combobox
+                            label="Listing type"
+                            value={newListingType}
+                            options={listingTypeOptions}
+                            onchange={handleNewListingTypeChange}
+                            required>
+                        </lightning-combobox>
+
+                        <lightning-combobox
+                            label="Condition"
+                            value={newCondition}
+                            options={conditionOptions}
+                            onchange={handleConditionChange}
+                            required>
+                        </lightning-combobox>
+
+                        <template lwc:if={isRentListing}>
+                            <lightning-input
+                                type="number"
+                                label="Price per day (₹)"
+                                min="0"
+                                step="0.01"
+                                value={newPrice}
+                                onchange={handlePriceChange}
+                                required>
+                            </lightning-input>
+                        </template>
+
+                        <template lwc:if={isSaleListing}>
+                            <lightning-input
+                                type="number"
+                                label="Sale price (₹)"
+                                min="0"
+                                step="0.01"
+                                value={newSalePrice}
+                                onchange={handleSalePriceChange}
+                                required>
+                            </lightning-input>
+                        </template>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <lightning-button
+                            label="Cancel"
+                            onclick={closeListingForm}
+                            disabled={isSaving}>
+                        </lightning-button>
+
+                        <lightning-button
+                            label="Publish Listing"
+                            variant="brand"
+                            class="slds-m-left_small"
+                            onclick={handleSaveListing}
+                            disabled={isSaving}>
+                        </lightning-button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- RENTAL REQUEST MODAL -->
+        <template lwc:if={rentalModalOpen}>
+            <section role="dialog"
+                     tabindex="-1"
+                     aria-modal="true"
+                     aria-labelledby="rental-heading"
+                     class="slds-modal slds-fade-in-open">
+
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            title="Close"
+                            onclick={closeRentalModal}
+                            class="slds-modal__close">
+                        </lightning-button-icon>
+
+                        <h2 id="rental-heading"
+                            class="slds-text-heading_medium">
+                            Request a Rental
+                        </h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p class="slds-m-bottom_medium">
+                            Choose the rental period. Your request will
+                            be sent to the resource owner for approval.
+                        </p>
+
+                        <lightning-input
+                            type="date"
+                            label="Start date"
+                            value={rentalStartDate}
+                            min={today}
+                            onchange={handleRentalStartChange}
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            type="date"
+                            label="End date"
+                            value={rentalEndDate}
+                            min={rentalStartDate}
+                            onchange={handleRentalEndChange}
+                            required>
+                        </lightning-input>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <lightning-button
+                            label="Cancel"
+                            onclick={closeRentalModal}
+                            disabled={rentalSaving}>
+                        </lightning-button>
+
+                        <lightning-button
+                            label="Submit Request"
+                            variant="brand"
+                            class="slds-m-left_small"
+                            onclick={submitRentalRequest}
+                            disabled={rentalSaving}>
+                        </lightning-button>
+                    </footer>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- RENTAL DASHBOARD -->
+        <div class="slds-box slds-theme_default slds-m-top_large">
+            <div class="slds-grid slds-wrap
+                        slds-grid_align-spread
+                        slds-grid_vertical-align-center">
+                <h2 class="slds-text-heading_medium">
+                    My Rental Dashboard
+                </h2>
+
+                <lightning-button
+                    label="Load My Requests"
+                    icon-name="utility:refresh"
+                    onclick={loadRentalRequests}
+                    disabled={isLoadingRequests}>
+                </lightning-button>
+            </div>
+
+            <template lwc:if={isLoadingRequests}>
+                <lightning-spinner
+                    alternative-text="Loading rental requests"
+                    size="small">
+                </lightning-spinner>
+            </template>
+
+            <!-- STUDENT REQUESTS -->
+            <div class="slds-m-top_large">
+                <h3 class="slds-text-heading_small slds-m-bottom_small">
+                    Requests I've Made
+                </h3>
+
+                <template lwc:if={myRequests.length}>
+                    <template for:each={myRequests} for:item="request">
+                        <div key={request.Id}
+                             class="slds-box slds-m-bottom_small">
+                            <p>
+                                <strong>{request.Resource__r.Name}</strong>
+                            </p>
+                            <p>Request: {request.Name}</p>
+                            <p>
+                                Dates: {request.Start_Date__c}
+                                to {request.End_Date__c}
+                            </p>
+                            <p>Rental days: {request.Rental_Days__c}</p>
+                            <p>Total cost: ₹{request.Total_Cost__c}</p>
+                            <p>Status: {request.Status__c}</p>
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:else>
+                    <p class="slds-text-color_weak">
+                        No rental requests to display.
+                    </p>
+                </template>
+            </div>
+
+            <!-- OWNER REQUESTS -->
+            <div class="slds-m-top_large">
+                <h3 class="slds-text-heading_small slds-m-bottom_small">
+                    Requests for My Resources
+                </h3>
+
+                <template lwc:if={ownerRequests.length}>
+                    <template for:each={ownerRequests} for:item="request">
+                        <div key={request.Id}
+                             class="slds-box slds-m-bottom_small">
+                            <p>
+                                <strong>{request.Resource__r.Name}</strong>
+                            </p>
+                            <p>Request: {request.Name}</p>
+                            <p>Requested by: {request.Requester__r.Name}</p>
+                            <p>
+                                Dates: {request.Start_Date__c}
+                                to {request.End_Date__c}
+                            </p>
+                            <p>Rental days: {request.Rental_Days__c}</p>
+                            <p>Total cost: ₹{request.Total_Cost__c}</p>
+                            <p>Status: {request.Status__c}</p>
+
+                            <div class="slds-m-top_small">
+                                <template lwc:if={request.isPending}>
+                                    <lightning-button
+                                        label="Approve"
+                                        variant="brand"
+                                        data-id={request.Id}
+                                        data-status="Approved"
+                                        onclick={handleRequestStatus}>
+                                    </lightning-button>
+
+                                    <lightning-button
+                                        label="Reject"
+                                        variant="destructive"
+                                        class="slds-m-left_x-small"
+                                        data-id={request.Id}
+                                        data-status="Rejected"
+                                        onclick={handleRequestStatus}>
+                                    </lightning-button>
+                                </template>
+
+                                <template lwc:if={request.canReturn}>
+                                    <lightning-button
+                                        label="Confirm Return"
+                                        data-id={request.Id}
+                                        data-status="Returned"
+                                        onclick={handleRequestStatus}>
+                                    </lightning-button>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+
+                <template lwc:else>
+                    <p class="slds-text-color_weak">
+                        No owner requests to display.
+                    </p>
+                </template>
+            </div>
+        </div>
+
+    </div>
+</template>
